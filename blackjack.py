@@ -1,110 +1,53 @@
-from random import randint
+from blackjack_helper import *
 
-var={1:[11,"an Ace"],2:[2,"a 2"],3:[3,"a 3"],4:[4,"a 4"],5:[5,"a 5"],6:[6,"a 6"],7:[7,"a 7"],
-    8:[8,"an 8"],9:[9,"a 9"],10:[10,"a 10"],11:[10,"a Jack"],12:[10,"a Queen"],13:[10,"a King"]}
-def main():
-    print("-----------\nYOUR TURN\n-----------")
-    card=user_game()
-    print("-----------\nDEALER TURN\n-----------")
-    dealer=dealer_game()
-    print("-----------\nGAME RESULT\n-----------")
-    if card>21:
-        print("Dealer wins!")
-    elif card==21 and dealer==21:
-        print("Push.")
-    elif card>dealer:
-        print("You win!")
-    elif card==dealer:
-        print("Push.")
-    else:
-        print("Dealer wins!")
+#GETTING USERS
+
+num_play = int(input("Welcome to Blackjack! How many players? "))
+player_score = {}
+
+
+for i in range(1,num_play+1):
+  player = input(f"What is player {i}'s name? ")
+  player_score[player] = 3
+
+cont = 'y'
+
+while cont == 'y':
+    player_hand = {}
+
+    # USER'S TURN
+    for key in player_score:
+      hand = user_game(key)
+      player_hand[key] = hand
+ 
+    # DEALER'S TURN
+    dealer_hand = draw_starting_hand("DEALER")
+    while dealer_hand < 17:
+      print("Dealer has {}.".format(dealer_hand))
+      dealer_hand = dealer_hand + draw_card()
+    print_end_turn_status(dealer_hand)
+
+    print_header('GAME RESULT')
     
-def card_name(c):
-    return var[c][1]
-def card_rank(c):
-    return var[c][0]
-def card_draw():
-    card=randint(1,13)
-    name=card_name(card)
-    rank=card_rank(card)
-    print(f"Drew {name}")
-    return rank
-def user_game():
-    c1=card_draw()
-    c2=card_draw()
-    hand_value=c1+c2
-    if hand_value==21:
-        print("Final hand: 21.")
-        print("BLACKJACK!")
-        return 21
-    elif hand_value==22:
-        print("Final hand: 22.")
-        print("BUST.")
-        return 22
-    else:
-        yn=input(f"You have {hand_value}. Hit (y/n)? ").strip()
-        while hand_value<21 and (yn=="y" or yn!="n"):
-            if yn=="y":
-                card=card_draw()
-                hand_value+=card
-                if hand_value>=21:
-                    break
-                yn=input(f"You have {hand_value}. Hit (y/n)? ").strip()
-            elif yn!="n":
-                print("Sorry I didn't get that.")
-                yn=input(f"You have {hand_value}. Hit (y/n)? ").strip()
-        if yn=="n":
-            print(f"Final hand: {hand_value}.")
-            if hand_value==21:
-                print("BLACKJACK!")
-            return hand_value
-        if hand_value>21:
-            print(f"Final hand: {hand_value}.")
-            print("BUST.")
-            return hand_value
-        elif hand_value==21:
-            print("Final hand: 21.")
-            print("BLACKJACK!")
-            return 21
-        return hand_value
+    eliminated_players = []
 
-def dealer_game():
-    c1=card_draw()
-    c2=card_draw()
-    hand_value=c1+c2
-    if hand_value==21:
-        print("Final hand: 21.")
-        print("BLACKJACK!")
-        return 21
-    elif hand_value==22:
-        print("Final hand: 22.")
-        print("BUST.")
-        return 22
-    elif hand_value<17:
-        print(f"Dealer has {hand_value}.")
-        while hand_value<17 :
-            card=card_draw()
-            hand_value+=card
-            if 17<=hand_value<=21:
-                break
-            print(f"Dealer has {hand_value}")
-        if hand_value==21:
-            print("BLACKJACK!")
-            return hand_value
-        elif hand_value>21:
-            print(f"Final hand: {hand_value}.")
-            print("BUST.")
-            return hand_value
-        else:
-            print(f"Final hand: {hand_value}.")
-            return hand_value
-    else:
-        print(f"Final hand: {hand_value}.")
-        return hand_value
-main()
+    for key in player_score:
+      print_end_game_status(key,player_hand[key],dealer_hand,player_score )
+      if player_score[key] == 0:
+        eliminated_players.append(key)
+
+    for player in eliminated_players:
+      print(f'{player} eliminated!')
+      player_score.pop(player)
+
+    if not player_score:
+      print("All players eliminated!")
+      break
+
+    cont = input ("Do you want to play another hand (y/n)? ")
 
 
-        
-                    
 
 
+
+    
